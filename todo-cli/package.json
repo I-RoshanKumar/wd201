@@ -1,0 +1,13 @@
+{
+  "name": "todo-cli",
+  "version": "1.0.0",
+  "main": "todo.js",
+ 
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node todo.js"
+  },
+  "author": "Roshan Kumar <anitamishraasansol@gmail.com>",
+  "license": "ISC",
+  "description": ""
+}
