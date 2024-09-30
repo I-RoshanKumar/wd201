@@ -8,11 +8,11 @@
     "prepare": "cd ..&& husky install todo-cli/.husky"
   },
   "lint-staged": {
-    "*.js": [
-      "eslint",
-      "prettier --write"
-    ]
-  },
+  "*.js": [
+    "eslint",
+    "prettier --write ."
+  ]
+},
   "author": "Roshan Kumar <anitamishraasansol@gmail.com>",
   "license": "ISC",
   "description": "",
