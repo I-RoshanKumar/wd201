@@ -1,6 +1,7 @@
 // models/todo.js
 "use strict";
 const { Model, Op } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
     /**
@@ -11,24 +12,21 @@ module.exports = (sequelize, DataTypes) => {
     static async addTask(params) {
       return await Todo.create(params);
     }
+
     static async showList() {
       console.log("My Todo list \n");
 
       console.log("Overdue");
-      // FILL IN HERE
       const overdueTasks = await Todo.overdue();
       overdueTasks.forEach((task) => console.log(task.displayableString()));
-
       console.log("\n");
 
       console.log("Due Today");
-      // FILL IN HERE
       const dueTodayTasks = await Todo.dueToday();
       dueTodayTasks.forEach((task) => console.log(task.displayableString()));
       console.log("\n");
 
       console.log("Due Later");
-      // FILL IN HERE
       const dueLaterTasks = await Todo.dueLater();
       dueLaterTasks.forEach((task) => console.log(task.displayableString()));
     }
@@ -40,38 +38,32 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.lt]: today,
           },
-          completed: false,
         },
       });
     }
 
     static async dueToday() {
-      // FILL IN HERE TO RETURN ITEMS DUE tODAY
       const today = new Date().toISOString().split("T")[0];
       return await Todo.findAll({
         where: {
           dueDate: today,
-          completed: false,
         },
       });
     }
 
     static async dueLater() {
-      // FILL IN HERE TO RETURN ITEMS DUE LATER
       const today = new Date().toISOString().split("T")[0];
       return await Todo.findAll({
         where: {
           dueDate: {
             [Op.gt]: today,
           },
-          completed: false,
         },
       });
     }
 
     static async markAsComplete(id) {
-      // FILL IN HERE TO MARK AN ITEM AS COMPLETE
-      const todo = new todo.findByPk(id);
+      const todo = await Todo.findByPk(id);
       if (todo) {
         todo.completed = true;
         await todo.save();
@@ -79,10 +71,13 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     displayableString() {
+      const today = new Date().toISOString().split("T")[0];
       let checkbox = this.completed ? "[x]" : "[ ]";
-      return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`;
+      let displayDate = this.dueDate === today ? "" : ` ${this.dueDate}`;
+      return `${this.id}. ${checkbox} ${this.title}${displayDate}`;
     }
   }
+
   Todo.init(
     {
       title: DataTypes.STRING,
@@ -94,5 +89,6 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Todo",
     },
   );
+
   return Todo;
 };
