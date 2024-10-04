@@ -79,20 +79,31 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     displayableString() {
+      const today = new Date().toISOString().split("T")[0];
       let checkbox = this.completed ? "[x]" : "[ ]";
-      return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`;
+      let displayDate = this.dueDate === today ? "" : this.dueDate;
+      return `${this.id}. ${checkbox} ${this.title} ${displayDate}`;
     }
   }
   Todo.init(
     {
-      title: DataTypes.STRING,
-      dueDate: DataTypes.DATEONLY,
-      completed: DataTypes.BOOLEAN,
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      dueDate: {
+        type: DataTypes.DATEONLY,
+      },
+      completed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       sequelize,
       modelName: "Todo",
     },
   );
+
   return Todo;
 };
