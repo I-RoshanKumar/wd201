@@ -1,0 +1,1 @@
+cd todo-app && npm test
