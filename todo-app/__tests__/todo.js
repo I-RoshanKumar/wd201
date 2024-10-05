@@ -20,7 +20,7 @@ describe("Todo test suite", () => {
     });
     test('responds with json at /todos',async () => {
       const response=await agent.post("/todos").send({
-        'title': "Buy milk",
+        title: "Buy milk",
         dueDate: new Date().toISOString(),
         completed: false,
       });
