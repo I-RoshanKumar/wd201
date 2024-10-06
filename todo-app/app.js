@@ -13,10 +13,10 @@ app.use(express.static(path.join(__dirname,"public")))
 app.get("/", async(request, response)=> {
   const allTodos=await Todo.getTodos();
   if(request.accepts("html")){
-    response.render("index",allTodos);
+  response.render("index",{allTodos});
   }
   else{
-    response.json(allTodos)
+    response.json({allTodos})
   }
  
   console.log("Starting the Todo Application ...");
