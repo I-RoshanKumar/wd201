@@ -26,3 +26,21 @@
     </li>
     <% } %>
 </ul>
+<script>
+    async function deleteTodo(id) {
+        try {
+            const response = await fetch(`/todos/${id}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            if (result) {
+                // Remove the todo item from the DOM
+                document.getElementById(`todo-item-${id}`).remove();
+            } else {
+                alert('Failed to delete the todo item.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
