@@ -107,6 +107,7 @@ app.put("/todos/:id/setCompletionStatus", async (req, res) => {
   }
 });
 
+
 app.delete("/todos/:id", async (req, res) => {
   try {
     const result = await Todo.destroy({

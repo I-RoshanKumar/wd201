@@ -8,6 +8,7 @@
     <li class="Todo-Item">
         <div class="flex w-fit px-2 my-2 py-1 items-center hover:bg-purple-100 rounded">
             <input id="todo-checkbox-<%= todos[i].id %>" type="checkbox" class="w-4 h-4" 
+                   onclick="updateTodo(<%= todos[i].id %>)" 
  <%= (todos[i].completed === true) ? 'checked' : '' %> >
 
             <label for="todo-checkbox-<%= todos[i].id %>" class="text-sm text-gray-600 ml-2 cursor-pointer">
