@@ -1,23 +1,46 @@
-<!DOCTYPE html>
+
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./css/styles.css">
 </head>
+
 <body>
-    <%- include("header.ejs") %>
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <%- include('header.ejs') %>
+        <form>
+
+            <div class="flex gap-2 py-4">
+                <div class="flex-auto">
+                    <input type="text" name="title" placeholder="what's next" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm" required/>    
+                </div>
+                <div class="flex-auto">
+                    <input type="date" name="dueDate" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4" required/>
+                </div>
+                <div class="flex-none">
+                    <button type="submit"  class="bg-green-500 text-white px-5 py-1.5 rounded font-medium mr-2 mb-2">Add</button>
+                </div>
+            </div>
+        </form>
+        
+        <%- include("todos.ejs", { title: "Overdue", todos: Over_due, count_id: "count-overdue" }) %>
+<%- include("todos.ejs", { title: "Due Today", todos: Today_list, count_id: "count-due-today" }) %>
+<%- include("todos.ejs", { title: "Due Later", todos: Later_list, count_id: "count-due-later" }) %>
+
+
+
+    </div>
     
-    <table>
-        <% for(var i = 0; i < allTodos.length; i++) { %> 
-        <tr>
-            <td>
-                <%= allTodos[i].title %> 
-            </td>
-        </tr>
-        <% } %>
-    </table>
-    <%- include("footer.ejs") %>
+    
+
+</body>
+</html>
+
+</div>
 </body>
 </html>

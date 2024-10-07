@@ -1,98 +1,132 @@
 /* eslint-disable no-undef */
 const express = require("express");
 const app = express();
-const { Todo } = require("./models");
-const bodyParser = require('body-parser');
-const path=require("path");
-app.use(bodyParser.json());
+const { Todo } = require("./models");  // Ensure you import Todo correctly
+const path = require("path");
+
+// Middleware for parsing JSON and URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.static(path.join(__dirname,"public")))
-
-app.get("/", async(request, response)=> {
-  const allTodos=await Todo.getTodos();
-  if(request.accepts("html")){
-  response.render("index",{allTodos});
-  }
-  else{
-    response.json({allTodos})
-  }
- 
-  console.log("Starting the Todo Application ...");
-});
-
-app.get("/todos", async function (_request, response) {
-  console.log("Processing list of all Todos ...");
-  // FILL IN YOUR CODE HERE
-
-  // First, we have to query our PostgerSQL database using Sequelize to get list of all Todos.
-  // Then, we have to respond with all Todos, like:
-  // response.send(todos)
-  try{
-    const todos=await Todo.findAll();
-    response.json(todos);
-  }
-  catch(error){
-    console.log(error);
-    response.status(500).json(error);
-  }
-});
-
-app.get("/todos/:id", async function (request, response) {
+app.get("/", async (req, res) => {
   try {
-    const todo = await Todo.findByPk(request.params.id);
-    return response.json(todo);
+    const todos = await Todo.findAll(); // Fetch all todos
+    const today = new Date().toISOString().split('T')[0];
+
+    const Over_due = todos.filter(todo => !todo.completed && todo.dueDate < today); // Overdue
+    const Today_list = todos.filter(todo => !todo.completed && todo.dueDate === today); // Due Today
+    const Later_list = todos.filter(todo => !todo.completed && todo.dueDate > today); // Due Later
+    const Completed_list = todos.filter(todo => todo.completed);
+
+    if (req.accepts('html')) {
+      res.render('index', { Today_list, Later_list, Over_due, Completed_list });
+    } else {
+      res.json({ Today_list, Later_list, Over_due, Completed_list });
+    }
   } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while fetching todos" });
   }
 });
 
-app.post("/todos", async function (request, response) {
-
+app.get("/todos", async (req, res) => {
   try {
-    const todo = await Todo.addTodo(request.body);
-    return response.json(todo);
+    const todos = await Todo.findAll();
+    return res.json(todos);
   } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
+    console.error(error);
+    return res.status(500).json({ error: "An error occurred while fetching todos" });
   }
 });
 
-app.put("/todos/:id/markAsCompleted", async function (request, response) {
-  const todo = await Todo.findByPk(request.params.id);
+app.get("/todos/:id", async (req, res) => {
   try {
+    const todo = await Todo.findByPk(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+    return res.json(todo);
+  } catch (error) {
+    console.error(error);
+    return res.status(422).json(error);
+  }
+});
+
+app.post("/todos", async (req, res) => {
+  try {
+    const todo = await Todo.addTodo(req.body);
+    return res.json(todo);
+  } catch (error) {
+    console.error(error);
+    return res.status(422).json(error);
+  }
+});
+
+app.put("/todos/:id/markAsCompleted", async (req, res) => {
+  try {
+    const todo = await Todo.findByPk(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
     const updatedTodo = await todo.markAsCompleted();
-    return response.json(updatedTodo);
+    return res.json(updatedTodo);
   } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
+    console.error(error);
+    return res.status(422).json(error);
   }
 });
 
-app.delete("/todos/:id", async function (request, response) {
-  console.log("We have to delete a Todo with ID: ", request.params.id);
-  // FILL IN YOUR CODE HERE
-  try{
-    const result=await Todo.destroy({
-      where:{
-        id:request.params.id
+app.put("/todos/:id", async (req, res) => {
+  try {
+    const todo = await Todo.findByPk(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+    const updatedTodo = await todo.update({ completed: req.body.completed });
+    return res.json(updatedTodo);
+  } catch (error) {
+    console.error(error);
+    return res.status(422).json(error);
+  }
+});
+
+app.put("/todos/:id/setCompletionStatus", async (req, res) => {
+  try {
+    const todo = await Todo.findByPk(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+    const updatedTodo = await todo.setCompletionStatus(!todo.completed);
+    return res.json(updatedTodo);
+  } catch (error) {
+    console.error(error);
+    return res.status(422).json(error);
+  }
+});
+
+app.delete("/todos/:id", async (req, res) => {
+  try {
+    const result = await Todo.destroy({
+      where: {
+        id: req.params.id
       }
     });
-    if(result){
-      response.send(true);
-    }else{
-      response.send(false);
+    if (result) {
+      res.send(true);
+    } else {
+      res.send(false);
     }
-  }catch(error){
-    console.log(error);
-    response.status(500).json(error);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(error);
   }
+});
 
-  // First, we have to query our database to delete a Todo by ID.
-  // Then, we have to respond back with true/false based on whether the Todo was deleted or not.
-  // response.send(true)
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
 });
 
 module.exports = app;

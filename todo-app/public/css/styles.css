@@ -1,5 +1,13 @@
 body{
-    background-color:rgb(221, 237, 154);
+    background-color:rgb(244, 246, 240);
     font-family: 'Courier New', Courier, monospace;
 
+}
+
+.Todo-Item:hover .trash-icon{
+    display: block;
+}
+
+.todo-Item:hover .trash-icon{
+    display: inline;
 }
