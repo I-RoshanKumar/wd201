@@ -77,34 +77,17 @@ app.post("/todos", async (req, res) => {
   }
 });
 
-// app.put("/todos/:id/markAsCompleted", async (req, res) => {
-//   try {
-//     const todo = await Todo.findByPk(req.params.id);
-//     if (!todo) {
-//       return res.status(404).json({ error: "Todo not found" });
-//     }
-//     const updatedTodo = await todo.markAsCompleted();
-//     return res.json(updatedTodo);
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(422).json(error);
-//   }
-// });
-
-// Assuming you have a Todos model
-app.put('/todos/:id/markAsCompleted', async (req, res) => {
+app.put("/todos/:id/markAsCompleted", async (req, res) => {
   try {
-      const todoId = req.params.id;
-      const todo = await Todo.findById(todoId);
-      if (!todo) {
-          return res.status(404).json({ message: 'Todo not found' });
-      }
-      // Toggle the completed status
-      todo.completed = !todo.completed;
-      await todo.save();
-      res.status(200).json({ message: 'Todo updated successfully' });
-  } catch (err) {
-      res.status(500).json({ err: err.message });
+    const todo = await Todo.findByPk(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+    const updatedTodo = await todo.markAsCompleted();
+    return res.json(updatedTodo);
+  } catch (error) {
+    console.error(error);
+    return res.status(422).json(error);
   }
 });
 
