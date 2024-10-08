@@ -7,15 +7,14 @@
     <% for(let i = 0; i < todos.length; i++) { %>
     <li class="Todo-Item">
         <div class="flex w-fit px-2 my-2 py-1 items-center hover:bg-purple-100 rounded">
-            <input id="todo-checkbox-<%= todos[i].id %>" type="checkbox" class="w-4 h-4" 
-                   onclick="updateTodo(<%= todos[i].id %>)" 
- <%= (todos[i].completed === true) ? 'checked' : '' %> >
+            <input id="todo-checkbox-<%= todos[i].id %>" type="checkbox" <%= todos[i].completed ? "checked" : "" %> onclick="updateTodo(<%= todos[i].id %>)" class="w-4 h-4 text-blue-600 bg-gray-200 rounded border-gray-300" />
+            
 
             <label for="todo-checkbox-<%= todos[i].id %>" class="text-sm text-gray-600 ml-2 cursor-pointer">
                 <%= todos[i].title %>
             </label>
 
-            <a href="#" class="ml-4 hidden trash-icon" onclick="deleteTodo(<%= todos[i].id %>)">
+            <a href="#" class="ml-4 hidden trash-icon" onclick="updateTodo(<%= todos[i].id %>)">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
                      stroke-width="1.5" stroke="currentColor" class="size-4">
                     <path stroke-linecap="round" stroke-linejoin="round" 
@@ -26,21 +25,4 @@
     </li>
     <% } %>
 </ul>
-<script>
-    async function deleteTodo(id) {
-        try {
-            const response = await fetch(`/todos/${id}`, {
-                method: 'DELETE'
-            });
-            const result = await response.json();
-            if (result) {
-                // Remove the todo item from the DOM
-                document.getElementById(`todo-item-${id}`).remove();
-            } else {
-                alert('Failed to delete the todo item.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-</script>
+

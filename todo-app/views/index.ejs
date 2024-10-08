@@ -7,7 +7,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./css/styles.css">
 </head>
+<script>
+function updateTodo(id) {
+    fetch(`/todos/${id}/markAsCompleted`, {
+        method: "put",
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((res) => {
+        if(res.ok){
+            window.location.reload();
+        }
 
+    })
+    .catch((err) => console.error(err));
+}
+</script>
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
