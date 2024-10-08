@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrfToken" content="<%= csrfToken %>">
     <title>Todo Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <script>
+    var token=document.querySelector('meta[name="csrfToken"]').getAttribute('content');
     function updateTodo(id) {
       
             // Send the PUT request to update the todo status
@@ -16,6 +18,10 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({
+                     "_csrf": token 
+                    }
+                )
             })
             .then((res)=>{
                 if(res.ok){
@@ -30,7 +36,11 @@
                 method: "DELETE",
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({
+                     "_csrf": token 
+                    }
+                )
             })
             .then((res)=>{
                 if(res.ok){
@@ -46,7 +56,7 @@
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
                 <form action="/todos" method="post">
-
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                     <div class="flex gap-2 py-4">
                         <div class="flex-auto">
                             <input type="text" name="title" placeholder="what's next"
