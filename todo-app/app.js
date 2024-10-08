@@ -79,17 +79,19 @@ app.post("/todos", async (req, res) => {
 
 app.put("/todos/:id/markAsCompleted", async (req, res) => {
   try {
-    const todo = await Todo.findByPk(req.params.id);
-    if (!todo) {
-      return res.status(404).json({ error: "Todo not found" });
-    }
-    const updatedTodo = await todo.markAsCompleted();
-    return res.json(updatedTodo);
+      const todo = await Todo.findByPk(req.params.id);
+      if (!todo) {
+          return res.status(404).json({ error: "Todo not found" });
+      }
+      const updatedTodo = await todo.markAsCompleted(); // Calls the updated method
+      return res.json(updatedTodo); // Returns the updated todo
   } catch (error) {
-    console.error(error);
-    return res.status(422).json(error);
+      console.error(error);
+      return res.status(422).json(error);
   }
 });
+
+
 
 
 app.put("/todos/:id", async (req, res) => {

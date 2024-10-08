@@ -8,22 +8,33 @@
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <script>
-function updateTodo(id) {
-    fetch(`/todos/${id}/markAsCompleted`, {
-        method: "put",
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then((res) => {
-        if(res.ok){
-            window.location.reload();
-        }
+    async function updateTodo(id) {
+        try {
+            // Send the PUT request to update the todo status
+            const response = await fetch(`/todos/${id}/markAsCompleted`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-    })
-    .catch((err) => console.error(err));
-}
+            const result = await response.json();
+
+            // Check if the update was successful
+            if (response.ok) {
+                // Get the checkbox element
+                const checkbox = document.getElementById(`todo-checkbox-${id}`);
+                // Toggle the checkbox based on the updated status from the server
+                checkbox.checked = result.completed;  // Assuming the server returns the updated todo
+            } else {
+                console.error('Error updating the todo item:', result.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 </script>
+
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
