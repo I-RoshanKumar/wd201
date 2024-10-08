@@ -1,28 +1,34 @@
 /* eslint-disable no-undef */
 const express = require("express");
 const app = express();
-const { Todo } = require("./models");  // Ensure you import Todo correctly
+const { Todo } = require("./models"); // Ensure you import Todo correctly
 const path = require("path");
-
+app.use(express.urlencoded({ extended: false }));
 // Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", async (req, res) => {
   try {
     const todos = await Todo.findAll(); // Fetch all todos
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
 
-    const Over_due = todos.filter(todo => !todo.completed && todo.dueDate < today); // Overdue
-    const Today_list = todos.filter(todo => !todo.completed && todo.dueDate === today); // Due Today
-    const Later_list = todos.filter(todo => !todo.completed && todo.dueDate > today); // Due Later
-    const Completed_list = todos.filter(todo => todo.completed);
+    const Over_due = todos.filter(
+      (todo) => !todo.completed && todo.dueDate < today,
+    ); // Overdue
+    const Today_list = todos.filter(
+      (todo) => !todo.completed && todo.dueDate === today,
+    ); // Due Today
+    const Later_list = todos.filter(
+      (todo) => !todo.completed && todo.dueDate > today,
+    ); // Due Later
+    const Completed_list = todos.filter((todo) => todo.completed);
 
-    if (req.accepts('html')) {
-      res.render('index', { Today_list, Later_list, Over_due, Completed_list });
+    if (req.accepts("html")) {
+      res.render("index", { Today_list, Later_list, Over_due, Completed_list });
     } else {
       res.json({ Today_list, Later_list, Over_due, Completed_list });
     }
@@ -38,7 +44,9 @@ app.get("/todos", async (req, res) => {
     return res.json(todos);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "An error occurred while fetching todos" });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while fetching todos" });
   }
 });
 
@@ -54,11 +62,15 @@ app.get("/todos/:id", async (req, res) => {
     return res.status(422).json(error);
   }
 });
-
 app.post("/todos", async (req, res) => {
+  console.log("Creating new Todos", req.body);
   try {
-    const todo = await Todo.addTodo(req.body);
-    return res.json(todo);
+    // Using req.body.title and req.body.dueDate directly
+    await Todo.addTodo({
+      title: req.body.title,
+      dueDate: req.body.dueDate,
+    });
+    return res.redirect("/");
   } catch (error) {
     console.error(error);
     return res.status(422).json(error);
@@ -107,13 +119,12 @@ app.put("/todos/:id/setCompletionStatus", async (req, res) => {
   }
 });
 
-
 app.delete("/todos/:id", async (req, res) => {
   try {
     const result = await Todo.destroy({
       where: {
-        id: req.params.id
-      }
+        id: req.params.id,
+      },
     });
     if (result) {
       res.send(true);
