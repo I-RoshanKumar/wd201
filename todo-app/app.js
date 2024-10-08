@@ -16,15 +16,9 @@ app.get("/", async (req, res) => {
     const todos = await Todo.findAll(); // Fetch all todos
     const today = new Date().toISOString().split("T")[0];
 
-    const Over_due = todos.filter(
-      (todo) => !todo.completed && todo.dueDate < today,
-    ); // Overdue
-    const Today_list = todos.filter(
-      (todo) => !todo.completed && todo.dueDate === today,
-    ); // Due Today
-    const Later_list = todos.filter(
-      (todo) => !todo.completed && todo.dueDate > today,
-    ); // Due Later
+    const Over_due = todos.filter((todo) => todo.dueDate < today); // Overdue
+    const Today_list = todos.filter((todo) => todo.dueDate === today); // Due Today
+    const Later_list = todos.filter((todo) => todo.dueDate > today); // Due Later
     const Completed_list = todos.filter((todo) => todo.completed);
 
     if (req.accepts("html")) {
@@ -79,20 +73,17 @@ app.post("/todos", async (req, res) => {
 
 app.put("/todos/:id/markAsCompleted", async (req, res) => {
   try {
-      const todo = await Todo.findByPk(req.params.id);
-      if (!todo) {
-          return res.status(404).json({ error: "Todo not found" });
-      }
-      const updatedTodo = await todo.markAsCompleted(); // Calls the updated method
-      return res.json(updatedTodo); // Returns the updated todo
+    const todo = await Todo.findByPk(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+    const updatedTodo = await todo.markAsCompleted(); // Calls the updated method
+    return res.json(updatedTodo); // Returns the updated todo
   } catch (error) {
-      console.error(error);
-      return res.status(422).json(error);
+    console.error(error);
+    return res.status(422).json(error);
   }
 });
-
-
-
 
 app.put("/todos/:id", async (req, res) => {
   try {
@@ -124,19 +115,11 @@ app.put("/todos/:id/setCompletionStatus", async (req, res) => {
 
 app.delete("/todos/:id", async (req, res) => {
   try {
-    const result = await Todo.destroy({
-      where: {
-        id: req.params.id,
-      },
-    });
-    if (result) {
-      res.send(true);
-    } else {
-      res.send(false);
-    }
+    await Todo.remove(req.params.id);
+    return res.json({ success: true });
   } catch (error) {
     console.error(error);
-    return res.status(500).json(error);
+    return res.status(422).json(error);
   }
 });
 

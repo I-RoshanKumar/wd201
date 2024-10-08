@@ -19,11 +19,15 @@ module.exports = (sequelize, DataTypes) => {
       return this.create({ title: title, dueDate: dueDate, completed: false });
     }
     markAsCompleted() {
-
-      this.completed = !this.completed; // If it's true, make it false, and vice versa
-      return this.save();
-  }
-  
+      this.update({ completed: true });
+    }
+    static async remove(id) {
+      return this.destroy({
+        where: {
+          id: id,
+        },
+      });
+    }
   }
   Todo.init(
     {
