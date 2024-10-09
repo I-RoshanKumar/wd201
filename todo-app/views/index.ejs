@@ -78,6 +78,8 @@
                     <%- include("todos.ejs", { title: "Due Today" , todos: Today_list, count_id: "count-due-today" }) %>
                         <%- include("todos.ejs", { title: "Due Later" , todos: Later_list, count_id: "count-due-later"
                             }) %>
+                            <%- include("todos.ejs", { title: "Completed" , todos: Completed_list, count_id: "count-completed"
+                        }) %>
         </div>
     </div>
 </body>
