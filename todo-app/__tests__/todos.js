@@ -54,7 +54,7 @@ describe("Todo Application", function () {
       .set("Accept", "application/json");
     const parsedGroupResponse = JSON.parse(groupTodoResponse.text);
     const dueTodayCount = parsedGroupResponse.dueToday.length;
-    console.log(dueTodayCount); 
+    console.log("duetoday",dueTodayCount); 
     const latestTodo = parsedGroupResponse.dueToday[dueTodayCount - 1];
 
     // Fetch the CSRF token again

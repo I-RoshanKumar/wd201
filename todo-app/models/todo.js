@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+    async setCompletionStatus(completed) {
+      this.completed = completed;
+      await this.save();
+      return this;
+    }
   }
   Todo.init(
     {
