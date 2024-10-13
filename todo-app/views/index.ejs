@@ -9,27 +9,28 @@
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <script>
-    var token=document.querySelector('meta[name="csrfToken"]').getAttribute('content');
-    function updateTodo(id) {
-      
-            // Send the PUT request to update the todo status
-        fetch(`/todos/${id}/markAsCompleted`, {
-                method: "PUT",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                     "_csrf": token 
-                    }
-                )
+  
+    var token = document.querySelector('meta[name="csrfToken"]').getAttribute('content');
+
+    function updateTodo(id, currentStatus) {
+        fetch(`/todos/${id}/setCompletionStatus`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "_csrf": token,
+                "completed": !currentStatus // toggle status
             })
-            .then((res)=>{
-                if(res.ok){
-                  window.location.reload();
-                }
-            })
-            .catch((err)=>console.error(err));
+        })
+        .then((res) => {
+            if (res.ok) {
+                window.location.reload();
+            }
+        })
+        .catch((err) => console.error(err));
     }
+  
     function deleteTodo(id) {
         // Send the DELETE request to delete the todo
         fetch(`/todos/${id}`, {
