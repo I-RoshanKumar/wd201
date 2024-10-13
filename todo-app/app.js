@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 const express = require("express");
 const app = express();
-const csurf=require("csurf");
-const { Todo } = require("./models"); // Ensure you import Todo correctly
+const csurf = require("csurf");
+const { Todo, User } = require("./models"); // Ensure you import Todo correctly
 const path = require("path");
 const cookieParser = require("cookie-parser");
 app.use(express.urlencoded({ extended: false }));
@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser("sh! some secret parsers"));
-app.use(csurf({cookie:true}));
+app.use(csurf({ cookie: true }));
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
@@ -26,7 +26,13 @@ app.get("/", async (req, res) => {
     const Completed_list = todos.filter((todo) => todo.completed);
 
     if (req.accepts("html")) {
-      res.render("index", { Today_list, Later_list, Over_due, Completed_list ,csrfToken:req.csrfToken()});
+      res.render("index", {
+        Today_list,
+        Later_list,
+        Over_due,
+        Completed_list,
+        csrfToken: req.csrfToken(),
+      });
     } else {
       res.json({ Today_list, Later_list, Over_due, Completed_list });
     }
@@ -158,8 +164,26 @@ app.delete("/todos/:id", async (req, res) => {
   }
 });
 
+app.get("/signup", (req, res) => {
+  res.render("signup", { title: "Signup", csrfToken: req.csrfToken() });
+});
+
+app.post("/users", async (req, res) => {
+  //have to create the user
+  try {
+    await User.create({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: req.body.password,
+    });
+    res.redirect("/");
+  } catch (error) {
+    console.error(error);
+    return res.status(422).json(error);
+  }
+});
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
-
 module.exports = app;

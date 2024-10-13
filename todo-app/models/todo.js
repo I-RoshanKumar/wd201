@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      */
 
     static associate(models) {
-      // define association here
+      Todo.belongsTo(models.User, { foreignKey: "userId" });
     }
     static getTodos() {
       return this.findAll();
@@ -42,7 +42,6 @@ module.exports = (sequelize, DataTypes) => {
     setCompletionStatus(status) {
       return this.update({ completed: status });
     }
-  
   }
   Todo.init(
     {
