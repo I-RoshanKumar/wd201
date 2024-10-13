@@ -53,9 +53,9 @@ describe("Todo Application", function () {
       .get("/")
       .set("Accept", "application/json");
     const parsedGroupResponse = JSON.parse(groupTodoResponse.text);
-    const dueTodayCount = parsedGroupResponse.dueToday.length;
+    const dueTodayCount = parsedGroupResponse.Today_list.length;
     console.log("duetoday", dueTodayCount);
-    const latestTodo = parsedGroupResponse.dueToday[dueTodayCount - 1];
+    const latestTodo = parsedGroupResponse.Today_list[dueTodayCount - 1];
 
     // Fetch the CSRF token again
     res = await agent.get("/");
