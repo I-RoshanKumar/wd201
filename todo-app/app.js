@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 const express = require("express");
 const app = express();
@@ -5,6 +6,13 @@ const csurf = require("csurf");
 const { Todo, User } = require("./models"); // Ensure you import Todo correctly
 const path = require("path");
 const cookieParser = require("cookie-parser");
+
+const passport = require("passport");
+const connectEnsureLogin = require("connect-ensure-login");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
+const { title } = require("process");
+
 app.use(express.urlencoded({ extended: false }));
 // Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
@@ -15,7 +23,56 @@ app.use(csurf({ cookie: true }));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(
+  session({
+    secret: "my-super-seceret-key-2121234124154",
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  }),
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    (email, password, done) => {
+      User.findOne({ where: { email: email, password: password } })
+        .then((user) => {
+          return done(null, user);
+        })
+        .cath((error) => {
+          return error;
+        });
+    },
+  ),
+);
+
+passport.serializeUser((user, done) => {
+  console.log("Serilizing user in session", user.id);
+  done(null, user.id);
+});
+passport.deserializeUser((id, done) => {
+  User.findByPk(id)
+    .then((user) => {
+      done(null, user);
+    })
+    .catch((error) => done(error, null));
+});
+
 app.get("/", async (req, res) => {
+  res.render("index", {
+    title: "Todo application",
+    csrfToken: res.csrfToken,
+  });
+});
+
+app.get("/todos", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
   try {
     const todos = await Todo.findAll(); // Fetch all todos
     const today = new Date().toISOString().split("T")[0];
@@ -26,31 +83,26 @@ app.get("/", async (req, res) => {
     const Completed_list = todos.filter((todo) => todo.completed);
 
     if (req.accepts("html")) {
-      res.render("index", {
+      res.render("todo", {
+        title: "Todo application",
         Today_list,
         Later_list,
         Over_due,
         Completed_list,
+
         csrfToken: req.csrfToken(),
       });
     } else {
-      res.json({ Today_list, Later_list, Over_due, Completed_list });
+      res.json({
+        Today_list,
+        Later_list,
+        Over_due,
+        Completed_list,
+      });
     }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching todos" });
-  }
-});
-
-app.get("/todos", async (req, res) => {
-  try {
-    const todos = await Todo.findAll();
-    return res.json(todos);
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ error: "An error occurred while fetching todos" });
   }
 });
 
@@ -74,7 +126,7 @@ app.post("/todos", async (req, res) => {
       title: req.body.title,
       dueDate: req.body.dueDate,
     });
-    return res.redirect("/");
+    return res.redirect("/todos");
   } catch (error) {
     console.error(error);
     return res.status(422).json(error);
@@ -171,13 +223,18 @@ app.get("/signup", (req, res) => {
 app.post("/users", async (req, res) => {
   //have to create the user
   try {
-    await User.create({
+    const user = await User.create({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
       password: req.body.password,
     });
-    res.redirect("/");
+    req.login(user, (err) => {
+      if (err) {
+        console.log(err);
+      }
+      res.redirect("/todos");
+    });
   } catch (error) {
     console.error(error);
     return res.status(422).json(error);

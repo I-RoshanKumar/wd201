@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 const request = require("supertest");
 const db = require("../models/index");
 const app = require("../app");
 var cheerio = require("cheerio");
+const { parser } = require("body-parser");
 let server, agent;
 
 function extractCsrfToken(res) {
@@ -68,7 +70,10 @@ describe("Todo Application", function () {
         _csrf: csrfToken,
       });
 
+    // By using this we can veriy the issue
+    // console.log(JSON.stringify(markCompleteResponse));
     const parsedUpdateResponse = JSON.parse(markCompleteResponse.text);
+
     expect(parsedUpdateResponse.completed).toBe(true);
   });
 

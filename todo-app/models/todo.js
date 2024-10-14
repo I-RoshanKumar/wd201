@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.create({ title: title, dueDate: dueDate, completed: false });
     }
     markAsCompleted() {
-      this.update({ completed: true });
+      return this.update({ completed: true });
     }
     static async remove(id) {
       return this.destroy({
